@@ -142,7 +142,17 @@ class UpdateGeoLiteDatabase extends Command
                 // $archive = new ZipArchive;
                 // $archive->open(storage_path(sprintf('app/temp/%s.%s', $item['edition_id'], $item['suffix'])));
                 // $archive->extractTo(storage_path('app/temp'));
+                foreach ($item['file_to_process'] as $category => $filename) {
+                    foreach ($filename as $file) {
+                        print("Extracting file $file from $category category...\n");
+                        if (($file_handle = fopen(storage_path(sprintf('app/temp/%s/%s', $item['temp_folder_name'], $file)), 'r')) !== false) {
+                            while (($data = fgetcsv($file_handle)) !== false) {
+                                //print_r($data);
+                            }
+                        }
 
+                    }
+                }
             } else {
                 // hash failed, break loop
                 // return 1;
