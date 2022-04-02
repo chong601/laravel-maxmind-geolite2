@@ -46,13 +46,38 @@ class UpdateGeoLiteDatabase extends Command
             'edition_id' => 'GeoLite2-ASN-CSV',
             'suffix' => 'zip',
             'hash_suffix' => 'zip.sha256',
-            'column_names' => ['network','autonomous_system_number','autonomous_system_organization']
+            'column_names' => ['network','autonomous_system_number','autonomous_system_organization'],
+            'temp_folder_name' => 'GeoLite2-ASN-CSV_20220329',
+            'file_to_process' => [
+                'blocks' => [
+                    'GeoLite2-ASN-Blocks-IPv4.csv',
+                    'GeoLite2-ASN-Blocks-IPv6.csv',
+                ]
+            ]
         ],
         [
             'edition_id' => 'GeoLite2-City-CSV',
             'suffix' => 'zip',
             'hash_suffix' => 'zip.sha256',
-            'column_names' => ['network','geoname_id','registered_country_geoname_id','represented_country_geoname_id','is_anonymous_proxy','is_satellite_provider','postal_code','latitude','longitude','accuracy_radius']
+            'column_names' => ['network','geoname_id','registered_country_geoname_id','represented_country_geoname_id','is_anonymous_proxy','is_satellite_provider','postal_code','latitude','longitude','accuracy_radius'],
+            'temp_folder_name' => 'GeoLite2-City-CSV_20220329',
+            'file_to_process' => [
+                'blocks' => [
+                    'GeoLite2-City-Blocks-IPv4.csv',
+                    'GeoLite2-City-Blocks-IPv6.csv',
+                ],
+                // Disable locations first
+                // 'locations' => [
+                //     'GeoLite2-City-Locations-de.csv',
+                //     'GeoLite2-City-Locations-en.csv',
+                //     'GeoLite2-City-Locations-es.csv',
+                //     'GeoLite2-City-Locations-fr.csv',
+                //     'GeoLite2-City-Locations-ja.csv',
+                //     'GeoLite2-City-Locations-pt-BR.csv',
+                //     'GeoLite2-City-Locations-ru.csv',
+                //     'GeoLite2-City-Locations-zh-CN.csv',
+                // ]
+            ]
         ],
     ];
 
