@@ -19,6 +19,8 @@ class CreateGeoipAsnTable extends Migration
             $table->string('network')->index();
             $table->bigInteger('autonomous_system_number');
             $table->text('autonomous_system_organization');
+            $table->decimal('ip_min_range', 40, 0, true)->index();
+            $table->decimal('ip_max_range', 40, 0, true)->index();
         });
     }
 
