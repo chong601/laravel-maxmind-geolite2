@@ -80,6 +80,49 @@ class UpdateGeoLiteDatabase extends Command
      */
     public function handle()
     {
+        // Create the temp dir if doesn't exist yet
+        if (!is_dir(storage_path('app/temp'))) {
+            mkdir(storage_path('app/temp'), 0770, true);
+        }
+
+        $client = new Client();
+        $error = [];
+        foreach ($this->downloadList as $item) {
+            try {
+                $hash = $client->request('get', $this->maxMindUrl, [
+                    RequestOptions::QUERY => ['edition_id' => $item['edition_id'], 'license_key' => $this->maxMindKey, 'suffix' => $item['hash_suffix']],
+                    RequestOptions::SINK => storage_path(sprintf('app/temp/%s.%s', $item['edition_id'], $item['suffix']))
+                ]);
+            } catch (ClientException $e) {
+                $error[] = 'Unable to download hash for ' . $item['edition_id'] . ' due to ' . $e->getMessage();
+                return 1;
+            }
+
+            try {
+                $data = $client->request('get', $this->maxMindUrl, [
+                    RequestOptions::QUERY => ['edition_id' => $item['edition_id'], 'license_key' => $this->maxMindKey, 'suffix' => $item['suffix']],
+                    RequestOptions::SINK => storage_path(sprintf('app/temp/%s.%s', $item['edition_id'], $item['suffix']))
+                ]);
+            } catch (ClientException $e) {
+                $error[] = 'Unable to download file for ' . $item['edition_id'] . ' due to ' . $e->getMessage();
+                return 1;
+            }
+
+            $file_hash = hash_file('sha256', storage_path(sprintf('app/temp/%s.%s', $item['edition_id'], $item['suffix'])));
+            $actual_hash = explode(' ',$hash->getBody()->getContents())[0];
+            if ($file_hash === $actual_hash) {
+                // // handle file
+                // print("Hash is valid: $file_hash matches the expected $actual_hash\n");
+                // // unzip file
+                // $archive = new ZipArchive;
+                // $archive->open(storage_path(sprintf('app/temp/%s.%s', $item['edition_id'], $item['suffix'])));
+                // $archive->extractTo(storage_path('app/temp'));
+
+            } else {
+                // hash failed, break loop
+                // return 1;
+            }
+        }
         return 0;
     }
 }
