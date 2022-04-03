@@ -152,6 +152,8 @@ class UpdateGeoLiteDatabase extends Command
                         print("Extracting file $file from $category category...\n");
                         if (($file_handle = fopen(storage_path(sprintf('app/temp/%s/%s', $item['temp_folder_name'], $file)), 'r')) !== false) {
                             $batch = [];
+                            // cheap hack and skip the first line
+                            fgetcsv($file_handle, 10000, ",");
                             while (($data = fgetcsv($file_handle)) !== false) {
                                 $batch[] = $data;
                                 if (count($batch) === 100) {
