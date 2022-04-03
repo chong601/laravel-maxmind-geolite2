@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\MissingMaxMindKeyException;
+use App\Jobs\LoadMaxmindDataToDatabase;
 use Illuminate\Console\Command;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -146,11 +147,18 @@ class UpdateGeoLiteDatabase extends Command
                     foreach ($filename as $file) {
                         print("Extracting file $file from $category category...\n");
                         if (($file_handle = fopen(storage_path(sprintf('app/temp/%s/%s', $item['temp_folder_name'], $file)), 'r')) !== false) {
+                            $batch = [];
                             while (($data = fgetcsv($file_handle)) !== false) {
-                                //print_r($data);
+                                $batch[] = $data;
+                                if (count($batch) === 100) {
+                                    // print_r($data);
+                                    LoadMaxmindDataToDatabase::dispatch($batch);
+                                    $batch = null;
+                                }
                             }
-                        }
 
+                            fclose($file_handle);
+                        }
                     }
                 }
             } else {
