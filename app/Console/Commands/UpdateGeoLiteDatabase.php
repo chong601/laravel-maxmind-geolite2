@@ -155,13 +155,16 @@ class UpdateGeoLiteDatabase extends Command
                             // cheap hack and skip the first line
                             fgetcsv($file_handle, 10000, ",");
                             while (($data = fgetcsv($file_handle)) !== false) {
-                                $batch[] = $data;
-                                if (count($batch) === 100) {
-                                    // print_r($data);
-                                    LoadMaxmindDataToDatabase::dispatch($batch);
+                                $final_column = $item['column_names'];
+                                $final_data = collect($data)->except([1,2,3,9])->toArray();
+                                $batch[] = array_combine($final_column, $final_data);
+                                if (count($batch) === 1000) {
+                                    LoadMaxmindDataToDatabase::dispatch($batch, $item['class_name']);
                                     $batch = null;
                                 }
                             }
+                            // dispatch one last time to move data to database
+                            LoadMaxmindDataToDatabase::dispatch($batch, $item['class_name']);
 
                             fclose($file_handle);
                         }
