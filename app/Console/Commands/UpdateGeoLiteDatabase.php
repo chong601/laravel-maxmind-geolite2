@@ -6,6 +6,7 @@ use App\Exceptions\MissingMaxMindKeyException;
 use App\Jobs\LoadMaxmindDataToDatabase;
 use App\Models\GeoipAsn;
 use App\Models\GeoipCity;
+use Exception;
 use Illuminate\Console\Command;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -45,7 +46,7 @@ class UpdateGeoLiteDatabase extends Command
      * Associative array that contains what to download.
      */
     protected $downloadList = [
-        [
+        'GeoLite2-ASN-CSV' => [
             'edition_id' => 'GeoLite2-ASN-CSV',
             'suffix' => 'zip',
             'hash_suffix' => 'zip.sha256',
@@ -59,7 +60,7 @@ class UpdateGeoLiteDatabase extends Command
             ],
             'class_name' => GeoipAsn::class
         ],
-        [
+        'GeoLite2-City-CSV' => [
             'edition_id' => 'GeoLite2-City-CSV',
             'suffix' => 'zip',
             'hash_suffix' => 'zip.sha256',
@@ -155,9 +156,7 @@ class UpdateGeoLiteDatabase extends Command
                             // cheap hack and skip the first line
                             fgetcsv($file_handle, 10000, ",");
                             while (($data = fgetcsv($file_handle)) !== false) {
-                                $final_column = $item['column_names'];
-                                $final_data = collect($data)->except([1,2,3,9])->toArray();
-                                $batch[] = array_combine($final_column, $final_data);
+                                $batch[] = $this->proxyExtraction($data, $key);
                                 if (count($batch) === 1000) {
                                     LoadMaxmindDataToDatabase::dispatch($batch, $item['class_name']);
                                     $batch = null;
@@ -176,5 +175,41 @@ class UpdateGeoLiteDatabase extends Command
             }
         }
         return 0;
+    }
+
+    /**
+     * Adaptable class to handle mixed-data situations
+     */
+    private function proxyExtraction($data, $edition_id)
+    {
+        switch ($edition_id) {
+            case 'GeoLite2-ASN-CSV':
+                return $this->extractAsnData($data);
+                break;
+            case 'GeoLite2-City-CSV':
+                return $this->extractCityData($data);
+                break;
+            default:
+                throw new Exception("Unknown $edition_id ediition ID. Please raise a bug ticket!");
+                break;
+        }
+    }
+
+    /**
+     * Handle ASN data
+     */
+    private function extractAsnData($data)
+    {
+        // It has no problem with the data. For now.
+        return $data;
+    }
+
+    /**
+     * Handle city data
+     */
+    private function extractCityData($data)
+    {
+        // I'm tired. Lets try this again later when I throw enough fit on how much empty data there is for city data
+        return [];
     }
 }
