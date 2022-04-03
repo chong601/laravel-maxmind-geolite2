@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Exceptions\MissingMaxMindKeyException;
 use App\Jobs\LoadMaxmindDataToDatabase;
+use App\Models\GeoipAsn;
+use App\Models\GeoipCity;
 use Illuminate\Console\Command;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -54,7 +56,8 @@ class UpdateGeoLiteDatabase extends Command
                     'GeoLite2-ASN-Blocks-IPv4.csv',
                     'GeoLite2-ASN-Blocks-IPv6.csv',
                 ]
-            ]
+            ],
+            'class_name' => GeoipAsn::class
         ],
         [
             'edition_id' => 'GeoLite2-City-CSV',
@@ -78,7 +81,8 @@ class UpdateGeoLiteDatabase extends Command
                 //     'GeoLite2-City-Locations-ru.csv',
                 //     'GeoLite2-City-Locations-zh-CN.csv',
                 // ]
-            ]
+                ],
+                'class_name' => GeoipCity::class
         ],
     ];
 
