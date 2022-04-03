@@ -19,14 +19,17 @@ class LoadMaxmindDataToDatabase implements ShouldQueue
 
     private $rows;
 
+    private $class;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($rows)
+    public function __construct($rows, $class)
     {
         $this->rows = $rows;
+        $this->class = $class;
     }
 
     /**
@@ -37,7 +40,11 @@ class LoadMaxmindDataToDatabase implements ShouldQueue
     public function handle()
     {
         // USE TRANSACTIONS.
-        // We don't want "gotchas" when table locking rearing it's head on select
-        print(count($this->rows));
+        // We don't want "gotchas" when table locking rearing it's head on selectthis
+        $datarow = $this->rows;
+        $class = $this->class;
+        DB::transaction(function () use ($datarow, $class)  {
+            $class::insert($datarow);
+        });
     }
 }
