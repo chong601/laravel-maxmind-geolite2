@@ -201,7 +201,23 @@ class UpdateGeoLiteDatabase extends Command
     private function extractAsnData($data)
     {
         // It has no problem with the data. For now.
-        return $data;
+        $final_data = [];
+        $columns = $this->downloadList['GeoLite2-ASN-CSV']['column_names'];
+        foreach ($columns as $index => $columnName) {
+            switch ($columnName) {
+                case 'network':
+                    $final_data[$columnName] = $data[$index];
+                    break;
+                case 'autonomous_system_number':
+                    $final_data[$columnName] = $data[$index];
+                    break;
+                case 'autonomous_system_organization':
+                    $final_data[$columnName] = $data[$index];
+                    break;
+            }
+        }
+
+        return $final_data;
     }
 
     /**
