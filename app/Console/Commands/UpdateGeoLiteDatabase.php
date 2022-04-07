@@ -149,16 +149,16 @@ class UpdateGeoLiteDatabase extends Command
                 // $archive = new ZipArchive;
                 // $archive->open(storage_path(sprintf('app/temp/%s.%s', $item['edition_id'], $item['suffix'])));
                 // $archive->extractTo(storage_path('app/temp'));
-                foreach ($item['file_to_process'] as $category => $filename) {
-                    foreach ($filename as $file) {
-                        print("Extracting file $file from $category category...\n");
-                        if (($file_handle = fopen(storage_path(sprintf('app/temp/%s/%s', $item['temp_folder_name'], $file)), 'r')) !== false) {
+                foreach ($item['file_to_process'] as $category => $file_structure) {
+                    foreach ($file_structure as $file) {
+                        print(sprintf("Extracting file %s from %s category...\n", $file['file_name'], $category));
+                        if (($file_handle = fopen(storage_path(sprintf('app/temp/%s/%s', $item['temp_folder_name'], $file['file_name'])), 'r')) !== false) {
                             $batch = [];
                             // cheap hack and skip the first line
-                            fgetcsv($file_handle, 10000, ",");
+                            fgetcsv($file_handle);
                             while (($data = fgetcsv($file_handle)) !== false) {
-                                $batch[] = $this->proxyExtraction($data, $key);
-                                if (count($batch) === 1000) {
+                                $batch[] = $this->proxyExtraction($data, $key, $file['ip_type']);
+                                if (count($batch) === 5000) {
                                     LoadMaxmindDataToDatabase::dispatch($batch, $item['class_name']);
                                     $batch = null;
                                 }
@@ -181,14 +181,14 @@ class UpdateGeoLiteDatabase extends Command
     /**
      * Adaptable class to handle mixed-data situations
      */
-    private function proxyExtraction($data, $edition_id)
+    private function proxyExtraction($data, $edition_id, $ip_type)
     {
         switch ($edition_id) {
             case 'GeoLite2-ASN-CSV':
-                return $this->extractAsnData($data);
+                return $this->extractAsnData($data, $ip_type);
                 break;
             case 'GeoLite2-City-CSV':
-                return $this->extractCityData($data);
+                return $this->extractCityData($data, $ip_type);
                 break;
             default:
                 throw new Exception("Unknown $edition_id ediition ID. Please raise a bug ticket!");
@@ -199,7 +199,7 @@ class UpdateGeoLiteDatabase extends Command
     /**
      * Handle ASN data
      */
-    private function extractAsnData($data)
+    private function extractAsnData($data, $ip_type)
     {
         // It has no problem with the data. For now.
         $final_data = [];
@@ -217,14 +217,14 @@ class UpdateGeoLiteDatabase extends Command
                     break;
             }
         }
-
+        $final_data['ipType'] = $ip_type;
         return $final_data;
     }
 
     /**
      * Handle city data
      */
-    private function extractCityData($data)
+    private function extractCityData($data, $ip_type)
     {
         $final_data = [];
         $columns = $this->downloadList['GeoLite2-City-CSV']['column_names'];
@@ -262,7 +262,7 @@ class UpdateGeoLiteDatabase extends Command
                     break;
             }
         }
-
+        $final_data['ipType'] = $ip_type;
         return $final_data;
     }
 }
