@@ -54,8 +54,8 @@ class UpdateGeoLiteDatabase extends Command
             'temp_folder_name' => 'GeoLite2-ASN-CSV_20220329',
             'file_to_process' => [
                 'blocks' => [
-                    'GeoLite2-ASN-Blocks-IPv4.csv',
-                    'GeoLite2-ASN-Blocks-IPv6.csv',
+                    ['file_name' => 'GeoLite2-ASN-Blocks-IPv4.csv', 'ip_type' => 4],
+                    ['file_name' => 'GeoLite2-ASN-Blocks-IPv6.csv', 'ip_type' => 6]
                 ]
             ],
             'class_name' => GeoipAsn::class
@@ -68,7 +68,8 @@ class UpdateGeoLiteDatabase extends Command
             'temp_folder_name' => 'GeoLite2-City-CSV_20220329',
             'file_to_process' => [
                 'blocks' => [
-                    'GeoLite2-City-Blocks-IPv4.csv', 'GeoLite2-City-Blocks-IPv6.csv'
+                    ['file_name' => 'GeoLite2-City-Blocks-IPv4.csv', 'ip_type' => 4],
+                    ['file_name' => 'GeoLite2-City-Blocks-IPv6.csv', 'ip_type' => 6]
                 ],
                 // Disable locations first
                 // 'locations' => [
