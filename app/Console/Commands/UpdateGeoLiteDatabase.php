@@ -206,14 +206,14 @@ class UpdateGeoLiteDatabase extends Command
         $columns = $this->downloadList['GeoLite2-ASN-CSV']['column_names'];
         foreach ($columns as $index => $columnName) {
             switch ($columnName) {
-                case 'network':
+                case $columns[0]:
                     $final_data[$columnName] = $data[$index];
                     break;
-                case 'autonomous_system_number':
-                    $final_data[$columnName] = $data[$index];
+                case $columns[1]:
+                    $final_data[$columnName] = empty($data[$index]) ? -1 : intval($data[$index]);
                     break;
-                case 'autonomous_system_organization':
-                    $final_data[$columnName] = $data[$index];
+                case $columns[2]:
+                    $final_data[$columnName] = empty($data[$index]) ? 'No Data' : $data[$index];
                     break;
             }
         }
@@ -243,10 +243,10 @@ class UpdateGeoLiteDatabase extends Command
                     $final_data[$columnName] = empty($data[$index])? -1: intval($data[$index]) ;
                     break;
                 case $columns[4]:
-                    $final_data[$columnName] = empty($data[$index])? -1: intval($data[$index]) ;
+                    $final_data[$columnName] = empty($data[$index])? false: intval($data[$index]) ;
                     break;
                 case $columns[5]:
-                    $final_data[$columnName] = empty($data[$index])? -1: intval($data[$index]) ;
+                    $final_data[$columnName] = empty($data[$index])? false: intval($data[$index]) ;
                     break;
                 case $columns[6]:
                     $final_data[$columnName] = empty($data[$index])? 'No Data': $data[$index] ;
