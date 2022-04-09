@@ -16,8 +16,8 @@ class CreateGeoipAsnsTable extends Migration
     {
         Schema::create('geoip_asns', function (Blueprint $table) {
             $table->string('network')->primary();
-            $table->bigInteger('autonomous_system_number');
-            $table->text('autonomous_system_organization');
+            $table->bigInteger('autonomous_system_number')->nullable();
+            $table->text('autonomous_system_organization')->nullable();
             $table->decimal('ip_min_range', 40, 0, true)->index()->nullable();
             $table->decimal('ip_max_range', 40, 0, true)->index()->nullable();
             $table->timestamp('created_at', 0)->nullable()->default(Carbon::now());

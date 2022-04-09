@@ -14,6 +14,7 @@ class AddIpTypeToGeoipCities extends Migration
     public function up()
     {
         Schema::table('geoip_cities', function (Blueprint $table) {
+            // Only works on MySQL
             $table->integer('ipType')->after('network');
         });
     }

@@ -14,6 +14,7 @@ class AddIpTypeToGeoipAsns extends Migration
     public function up()
     {
         Schema::table('geoip_asns', function (Blueprint $table) {
+            // Only works on MySQL
             $table->integer('ipType')->after('network');
         });
     }
